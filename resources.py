@@ -7,9 +7,6 @@ dim = (square_size, square_size)
 rock = cv.imread("assets/rock_tileable.png")
 rock = cv.resize(rock, dim, interpolation=cv.INTER_AREA)
 
-hole = cv.imread("assets/hole_tileable.png")
-hole = cv.resize(hole, dim, interpolation=cv.INTER_AREA)
-
 wood = cv.imread("assets/wood_planks_tileable.png")
 wood = cv.resize(wood, dim, interpolation=cv.INTER_AREA)
 
