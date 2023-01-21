@@ -7,27 +7,29 @@ from tkinter import *
 from resources import *
 
 
-def makeform(root, fields):
-    entries = {}
-    for field in fields:
-        row = Frame(root)
+def make_form(rt, fds):
+    ents = {}
+    for field in fds:
+        row = Frame(rt)
         lab = Label(row, width=10, text=field + ": ", anchor='w')
         ent = Entry(row)
         if field == "Width":
-            ent.insert(0, width)
+            ent.insert(0, 10)
         elif field == "Height":
-            ent.insert(0, height)
+            ent.insert(0, 10)
+        elif field == "Square size":
+            ent.insert(0, 50)
         row.pack(side=TOP, fill=X, padx=5, pady=5)
         lab.pack(side=LEFT)
         ent.pack(side=RIGHT, expand=YES, fill=X)
-        entries[field] = ent
-    return entries
+        ents[field] = ent
+    return ents
 
 
 def form_action():
-    global go
+    global confirm
     global root
-    go = True
+    confirm = True
     root.quit()
 
 
@@ -49,23 +51,21 @@ def paste_image(src: np.ndarray, dest: np.ndarray, x_offset: int, y_offset: int)
         dest[y1:y2, x1:x2, c] = (alpha_src * src[:, :, c] + alpha_dest * dest[y1:y2, x1:x2, c])
 
 
-go = False
-width = 10
-height = 10
-fields = ('Width', 'Height')
+confirm = False
+fields = ('Width', 'Height', 'Square size')
 root = Tk()
 root.title("Map Generator")
-entries = makeform(root, fields)
-# root.bind('<Return>', (lambda event, e=entries: fetch(e)))
+entries = make_form(root, fields)
 button1 = Button(root, text='Confirm', command=form_action)
 button1.pack(side=BOTTOM, padx=5, pady=5)
 root.mainloop()
 
-if go:
-    width = int(entries['Width'].get())
-    height = int(entries['Height'].get())
-else:
+if not confirm:
     exit(0)
+
+width = int(entries['Width'].get())
+height = int(entries['Height'].get())
+square_size = int(entries['Square size'].get())
 
 root.destroy()
 pygame.init()
@@ -75,6 +75,7 @@ screen_height = height * square_size
 screen = pygame.display.set_mode((width * square_size, height * square_size))
 
 tiles = [[None for col in range(width)] for row in range(height)]
+scale_images(square_size)
 
 done = False
 while not done:
@@ -88,7 +89,7 @@ while not done:
 
     for ev in pygame.event.get():
         if ev.type == pygame.QUIT:
-            sys.exit(0)
+            exit(0)
         if ev.type == pygame.KEYDOWN:
             if ev.key == pygame.K_RETURN:
                 done = True
@@ -148,10 +149,9 @@ for y, row in enumerate(tiles):
         if t in tile_mapper:
             game_map[y * square_size:(y + 1) * square_size,
                      x * square_size:(x + 1) * square_size, :] = tile_mapper[t][:, :, :]
-            # paste_image(tile_mapper[t], game_map, x * square_size, y * square_size)
 
 cv.imwrite("your_map.png", game_map)
-sys.exit(0)
+exit(0)
 
 # margin = 100
 #
