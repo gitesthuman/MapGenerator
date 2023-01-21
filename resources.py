@@ -27,11 +27,11 @@ dark_smooth_stone_puddle = cv.resize(dark_smooth_stone_puddle, dim, interpolatio
 
 
 tile_mapper = {
-    "0": wood,
-    "1": rock,
-    "2": moss,
-    "3": stone_bricks,
-    "4": smooth_stone,
-    "5": dark_smooth_stone,
-    "6": dark_smooth_stone_puddle
+    "Wood": wood,
+    "Rock": rock,
+    "Moss": moss,
+    "Stone bricks": stone_bricks,
+    "Smooth stone": smooth_stone,
+    "Dark smooth stone": dark_smooth_stone,
+    "Dark smooth stone with puddle": dark_smooth_stone_puddle
 }
