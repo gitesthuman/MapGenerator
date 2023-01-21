@@ -1,6 +1,6 @@
 # MapGenerator
 
-Requires Python3.10, numpy, opencv2, matplotlib.
+Requires Python3.10, numpy, opencv2, tkinter.
 
 ## Guide
 
