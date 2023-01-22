@@ -2,6 +2,10 @@
 
 Requires Python3.10, numpy, opencv2, tkinter.
 
+# Assets
+In folder assets there are some textures I uploaded. If you want to use or own ones, add them in file `resources.py` to list `textures`. 
+The patern is tuple containing: (texture_path, texture_name).
+
 # Guide
 
 Select dimensions your map you want to have and single tile size in pixels.
