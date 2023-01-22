@@ -228,13 +228,13 @@ while not done:
 
     pygame.display.update()
 
-game_map = np.zeros((screen_width, screen_height, 3), np.uint8)
+game_map = np.zeros((screen_height, screen_width, 3), np.uint8)
 
-for y, row in enumerate(tiles):
-    for x, t in enumerate(row):
+for y, r in enumerate(tiles):
+    for x, t in enumerate(r):
         if t in tile_mapper:
             game_map[y * square_size:(y + 1) * square_size,
-                     x * square_size:(x + 1) * square_size, :] = tile_mapper[t][:, :, :]
+                     x * square_size:(x + 1) * square_size] = tile_mapper[t]
 
 cv.imwrite("your_map.png", game_map)
 exit(0)
