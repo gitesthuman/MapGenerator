@@ -82,13 +82,24 @@ board_color = (143, 210, 255)
 line_color = (194, 242, 252)
 options_color = (255, 244, 255)
 options_hover = (223, 212, 223)
+select_color = (0, 0, 65)
 
 tiles = [[None for col in range(width)] for row in range(height)]
 scale_images(square_size)
+available_tiles = [(small_font.render(t, True, black), t) for t in tile_mapper]
 
 hover = pygame.Surface((square_size, square_size))
 hover.set_alpha(75)
 hover.fill(hover_color)
+
+selecting = False
+select_x = 0
+select_y = 0
+
+from_x = 0
+from_y = 0
+to_x = 0
+to_y = 0
 
 done = False
 while not done:
@@ -105,8 +116,22 @@ while not done:
             if t:
                 screen.blit(pygame.image.frombuffer(tile_mapper[t].tobytes(), tile_mapper[t].shape[1::-1], "BGR"),
                             (square_size * i, square_size * j))
+    if selecting:
+        from_x = min(select_x, mouse[0]) // square_size
+        from_y = min(select_y, mouse[1]) // square_size
+        to_x = max(select_x, mouse[0]) // square_size
+        to_y = max(select_y, mouse[1]) // square_size
 
-    screen.blit(hover, ((mouse[0] // square_size) * square_size, (mouse[1] // square_size) * square_size))
+        for j in range(from_y, to_y + 1):
+            for i in range(from_x, to_x + 1):
+                screen.blit(hover, (i * square_size, j * square_size))
+
+        pygame.draw.rect(screen, select_color, pygame.Rect(min(select_x, mouse[0]), min(select_y, mouse[1]),
+                                                    max(mouse[0] - select_x, select_x - mouse[0]),
+                                                    max(mouse[1] - select_y, select_y - mouse[1])), 2)
+
+    else:
+        screen.blit(hover, ((mouse[0] // square_size) * square_size, (mouse[1] // square_size) * square_size))
 
     for ev in pygame.event.get():
         if ev.type == pygame.QUIT:
@@ -115,11 +140,57 @@ while not done:
             if ev.key == pygame.K_RETURN:
                 done = True
                 break
+        if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1:
+            selecting = True
+            select_x, select_y = mouse[:2]
+        if ev.type == pygame.MOUSEBUTTONUP and ev.button == 1:
+            if selecting:
+                x = mouse[0] // square_size
+                y = mouse[1] // square_size
+
+                option_w = max([t[0].get_width() for t in available_tiles])
+                option_h = 12
+
+                posX = min(mouse[0], screen_width - option_w)
+                posY = min(mouse[1], screen_height - option_h * len(available_tiles))
+
+                added = False
+                while not added:
+                    mouse = pygame.mouse.get_pos()
+
+                    for i, t in enumerate(available_tiles):
+                        if posX <= mouse[0] < posX + option_w \
+                                and posY + option_h * i <= mouse[1] < posY + option_h * (i + 1):
+                            pygame.draw.rect(screen, options_hover,
+                                             pygame.Rect(posX, posY + option_h * i, option_w, option_h))
+                        else:
+                            pygame.draw.rect(screen, options_color,
+                                             pygame.Rect(posX, posY + option_h * i, option_w, option_h))
+
+                    for ev2 in pygame.event.get():
+                        if ev2.type == pygame.QUIT:
+                            exit(0)
+                        if ev2.type == pygame.MOUSEBUTTONDOWN and ev2.button == 1:
+                            for i, t in enumerate(available_tiles):
+                                if posX <= mouse[0] < posX + option_w \
+                                        and posY + option_h * i <= mouse[1] < posY + option_h * (i + 1):
+                                    for j in range(from_y, to_y + 1):
+                                        for i in range(from_x, to_x + 1):
+                                            tiles[j][i] = t[1]
+                                    break
+
+                            added = True
+
+                    for i, t in enumerate(available_tiles):
+                        screen.blit(t[0], (posX, posY + option_h * i - 1))
+
+                    pygame.display.update()
+                selecting = False
+
         if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 3:
             x = mouse[0] // square_size
             y = mouse[1] // square_size
 
-            available_tiles = [(small_font.render(t, True, black), t) for t in tile_mapper]
             option_w = max([t[0].get_width() for t in available_tiles])
             option_h = 12
 

@@ -12,3 +12,6 @@ Right-click on field you want to change, then select one of the textures.
 Press ENTER to save your image. The file will be named `your_map.png`.
 
 ![image](https://user-images.githubusercontent.com/90265591/213894860-e63adedc-d3e9-4b5b-bb34-3428741c8129.png)
+
+You can also hold left mouse button to select an area and paste one texture to 
+every single of selected fields.
