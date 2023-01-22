@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import os
 import numpy as np
 import pygame
 from tkinter import *
@@ -81,6 +80,8 @@ color_dark = (130, 130, 130)
 hover_color = (255, 255, 255)
 board_color = (143, 210, 255)
 line_color = (194, 242, 252)
+options_color = (255, 244, 255)
+options_hover = (223, 212, 223)
 
 tiles = [[None for col in range(width)] for row in range(height)]
 scale_images(square_size)
@@ -95,9 +96,9 @@ while not done:
     screen.fill(board_color)
 
     for k in range(1, width):
-        pygame.draw.rect(screen, line_color, pygame.Rect(k * square_size, 0, 2, screen_height))
+        pygame.draw.rect(screen, line_color, pygame.Rect(k * square_size - 1, 0, 2, screen_height))
     for k in range(1, height):
-        pygame.draw.rect(screen, line_color, pygame.Rect(0, k * square_size, screen_width, 2))
+        pygame.draw.rect(screen, line_color, pygame.Rect(0, k * square_size - 1, screen_width, 2))
 
     for j, row in enumerate(tiles):
         for i, t in enumerate(row):
@@ -132,15 +133,15 @@ while not done:
                 for i, t in enumerate(available_tiles):
                     if posX <= mouse[0] < posX + option_w \
                             and posY + option_h * i <= mouse[1] < posY + option_h * (i + 1):
-                        pygame.draw.rect(screen, color_light,
+                        pygame.draw.rect(screen, options_hover,
                                          pygame.Rect(posX, posY + option_h * i, option_w, option_h))
                     else:
-                        pygame.draw.rect(screen, color_dark,
+                        pygame.draw.rect(screen, options_color,
                                          pygame.Rect(posX, posY + option_h * i, option_w, option_h))
 
                 for ev2 in pygame.event.get():
                     if ev2.type == pygame.QUIT:
-                        sys.exit(0)
+                        exit(0)
                     if ev2.type == pygame.MOUSEBUTTONDOWN and ev2.button == 1:
                         for i, t in enumerate(available_tiles):
                             if posX <= mouse[0] < posX + option_w \
