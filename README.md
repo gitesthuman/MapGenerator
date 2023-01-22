@@ -21,3 +21,6 @@ You can also hold left mouse button to select an area and paste one texture to
 every single of selected fields.
 
 ![img](https://user-images.githubusercontent.com/90265591/213919314-e20c81a4-215a-495e-a3bb-a6de5622a8be.png)
+
+After saving the map you can set up entities' positions. Press ENTER to save it
+to a json file `entities.json`.

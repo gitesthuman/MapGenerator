@@ -1,4 +1,5 @@
 import cv2 as cv
+import pygame
 
 
 def scale_images(square_size):
@@ -9,14 +10,26 @@ def scale_images(square_size):
         img = cv.resize(img, dim, interpolation=cv.INTER_AREA)
         tile_mapper[t[1]] = img
 
+    for e in entities:
+        img = pygame.image.load(e[0]).convert_alpha()
+        img = pygame.transform.scale(img, dim)
+        entity_mapper[e[1]] = img
+
 
 textures = [
-    ("assets/rock_tileable.png", "Rock"),
-    ("assets/wood_planks_tileable.png", "Wood"),
-    ("assets/moss_tileable.png", "Moss"),
-    ("assets/stone_bricks_tileable.png", "Stone bricks"),
-    ("assets/smooth_stone_tileable.png", "Smooth stone"),
-    ("assets/dark_smooth_stone_tileable.png", "Dark smooth stone"),
-    ("assets/dark_smooth_stone_with_puddle_tileable.png", "Dark smooth stone with puddle")
+    ("assets/textures/rock_tileable.png", "Rock"),
+    ("assets/textures/wood_planks_tileable.png", "Wood"),
+    ("assets/textures/moss_tileable.png", "Moss"),
+    ("assets/textures/stone_bricks_tileable.png", "Stone bricks"),
+    ("assets/textures/smooth_stone_tileable.png", "Smooth stone"),
+    ("assets/textures/dark_smooth_stone_tileable.png", "Dark smooth stone"),
+    ("assets/textures/dark_smooth_stone_with_puddle_tileable.png", "Dark smooth stone with puddle")
 ]
+entities = [
+    ("assets/entities/player.png", "Player spawn point", 1),
+    ("assets/entities/rock.png", "Rock", 2),
+    ("assets/entities/hole.png", "Hole", 3)
+]
+
 tile_mapper = dict()
+entity_mapper = dict()
