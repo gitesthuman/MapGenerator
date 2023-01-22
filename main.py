@@ -74,18 +74,38 @@ screen_width = width * square_size
 screen_height = height * square_size
 screen = pygame.display.set_mode((width * square_size, height * square_size))
 
+small_font = pygame.font.SysFont('Arial', 12)
+black = (0, 0, 0)
+color_light = (176, 176, 176)
+color_dark = (130, 130, 130)
+hover_color = (255, 255, 255)
+board_color = (143, 210, 255)
+line_color = (194, 242, 252)
+
 tiles = [[None for col in range(width)] for row in range(height)]
 scale_images(square_size)
+
+hover = pygame.Surface((square_size, square_size))
+hover.set_alpha(75)
+hover.fill(hover_color)
 
 done = False
 while not done:
     mouse = pygame.mouse.get_pos()
-    screen.fill((0, 0, 0))
+    screen.fill(board_color)
+
+    for k in range(1, width):
+        pygame.draw.rect(screen, line_color, pygame.Rect(k * square_size, 0, 2, screen_height))
+    for k in range(1, height):
+        pygame.draw.rect(screen, line_color, pygame.Rect(0, k * square_size, screen_width, 2))
+
     for j, row in enumerate(tiles):
         for i, t in enumerate(row):
             if t:
                 screen.blit(pygame.image.frombuffer(tile_mapper[t].tobytes(), tile_mapper[t].shape[1::-1], "BGR"),
                             (square_size * i, square_size * j))
+
+    screen.blit(hover, ((mouse[0] // square_size) * square_size, (mouse[1] // square_size) * square_size))
 
     for ev in pygame.event.get():
         if ev.type == pygame.QUIT:
@@ -94,25 +114,20 @@ while not done:
             if ev.key == pygame.K_RETURN:
                 done = True
                 break
-        if ev.type == pygame.MOUSEBUTTONDOWN and ev.button in [1, 3]:
-            x = (mouse[0] - screen_width) // square_size
-            y = (mouse[1] - screen_height) // square_size
-
-            posX = mouse[0]
-            posY = mouse[1]
-            added = False
-            black = (0, 0, 0)
-            small_font = pygame.font.SysFont('Arial', 12)
-            color_light = (176, 176, 176)
-            color_dark = (130, 130, 130)
+        if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 3:
+            x = mouse[0] // square_size
+            y = mouse[1] // square_size
 
             available_tiles = [(small_font.render(t, True, black), t) for t in tile_mapper]
+            option_w = max([t[0].get_width() for t in available_tiles])
+            option_h = 12
 
+            posX = min(mouse[0], screen_width - option_w)
+            posY = min(mouse[1], screen_height - option_h * len(available_tiles))
+
+            added = False
             while not added:
                 mouse = pygame.mouse.get_pos()
-
-                option_w = max([t[0].get_width() for t in available_tiles])
-                option_h = 12
 
                 for i, t in enumerate(available_tiles):
                     if posX <= mouse[0] < posX + option_w \
@@ -126,7 +141,7 @@ while not done:
                 for ev2 in pygame.event.get():
                     if ev2.type == pygame.QUIT:
                         sys.exit(0)
-                    if ev2.type == pygame.MOUSEBUTTONDOWN and ev2.button == 1:  # dodanie (rzeczywiste kliknięcie)
+                    if ev2.type == pygame.MOUSEBUTTONDOWN and ev2.button == 1:
                         for i, t in enumerate(available_tiles):
                             if posX <= mouse[0] < posX + option_w \
                                     and posY + option_h * i <= mouse[1] < posY + option_h * (i + 1):
@@ -152,40 +167,3 @@ for y, row in enumerate(tiles):
 
 cv.imwrite("your_map.png", game_map)
 exit(0)
-
-# margin = 100
-#
-# game_map = None
-# accept = False
-# end = False
-# while not accept and not end:
-#     file_name = input("Enter your file's path: ")
-#
-#     if not os.path.isfile(file_name):
-#         print("File not found.")
-#         continue
-#
-#     tiles = []
-#     for row in open(file_name, "r").read().splitlines():
-#         tiles.append(row.split(";"))
-#
-#     w = len(tiles[0])
-#     h = len(tiles)
-#
-#     game_map = np.zeros((2 * margin + w * square_size, 2 * margin + h * square_size, 3), np.uint8)
-#
-#     for x, row in enumerate(tiles):
-#         for y, tile in enumerate(row):
-#             if tile in tile_mapper:
-#                 game_map[margin + x * square_size:margin + (x + 1) * square_size,
-#                          margin + y * square_size:margin + (y + 1) * square_size] = tile_mapper[tile]
-#
-#     plt.imshow(cv.merge(list(reversed(cv.split(game_map)))))
-#     plt.show()
-#     accept = input("Is this what you want your map to look like? (type yes/no) ") == "yes"
-#     if not accept:
-#         end = input("Do you want to try again? (type yes/no) ") == "no"
-#
-# if accept:
-#     cv.imwrite("your_map.png", game_map)
-#     print("File saved as \"your_map.png\"")
