@@ -15,3 +15,5 @@ Press ENTER to save your image. The file will be named `your_map.png`.
 
 You can also hold left mouse button to select an area and paste one texture to 
 every single of selected fields.
+
+![img](https://user-images.githubusercontent.com/90265591/213919314-e20c81a4-215a-495e-a3bb-a6de5622a8be.png)
