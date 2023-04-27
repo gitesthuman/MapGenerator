@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import pygame
 from tkinter import *
@@ -56,21 +57,33 @@ root.title("Map Generator")
 entries = make_form(root, fields)
 button1 = Button(root, text='Confirm', command=form_action)
 button1.pack(side=BOTTOM, padx=5, pady=5)
-root.mainloop()
+MAX_SCREEN_WIDTH = 1500
+MAX_SCREEN_HEIGHT = 780
 
-if not confirm:
-    sys.exit(0)
+while True:
+    root.mainloop()
 
-width = int(entries['Width'].get())
-height = int(entries['Height'].get())
-square_size = int(entries['Square size'].get())
+    if not confirm:
+        sys.exit(0)
+
+    width = int(entries['Width'].get())
+    height = int(entries['Height'].get())
+    square_size = int(entries['Square size'].get())
+
+    if 1 <= width < MAX_SCREEN_WIDTH and 1 <= height < MAX_SCREEN_HEIGHT and 1 <= square_size <= square_size * min(width, height):
+        break
+    confirm = False
+SQUARE_SIZE = square_size
 
 root.destroy()
 pygame.init()
 pygame.display.set_caption("Map Creator")
-screen_width = width * square_size
-screen_height = height * square_size
-screen = pygame.display.set_mode((width * square_size, height * square_size))
+
+if width * square_size > MAX_SCREEN_WIDTH or height * square_size > MAX_SCREEN_HEIGHT:
+    square_size = min(MAX_SCREEN_WIDTH // width, MAX_SCREEN_HEIGHT // height)
+screen_width = min(width * square_size, MAX_SCREEN_WIDTH)
+screen_height = min(height * square_size, MAX_SCREEN_HEIGHT)
+screen = pygame.display.set_mode((screen_width, screen_height))
 
 small_font = pygame.font.SysFont('Arial', 12)
 black = (0, 0, 0)
@@ -84,7 +97,7 @@ options_hover = (223, 212, 223)
 select_color = (0, 0, 65)
 
 tiles = [[None for col in range(width)] for row in range(height)]
-scale_images(square_size)
+scale_images(SQUARE_SIZE)
 available_tiles = [(small_font.render(t, True, black), t) for t in tile_mapper]
 
 hover = pygame.Surface((square_size, square_size))
@@ -112,7 +125,9 @@ def draw_board():
     for j, row in enumerate(tiles):
         for i, t in enumerate(row):
             if t:
-                screen.blit(pygame.image.frombuffer(tile_mapper[t].tobytes(), tile_mapper[t].shape[1::-1], "BGR"),
+                screen.blit(pygame.transform.scale(
+                    pygame.image.frombuffer(tile_mapper[t].tobytes(), tile_mapper[t].shape[1::-1], "BGR"),
+                    (square_size, square_size)),
                             (square_size * i, square_size * j))
 
 
@@ -203,13 +218,13 @@ while not done:
 
     pygame.display.update()
 
-game_map = np.zeros((screen_height, screen_width, 3), np.uint8)
+game_map = np.zeros((height * SQUARE_SIZE, width * SQUARE_SIZE, 3), np.uint8)
 # paste tile on the board
 for y, r in enumerate(tiles):
     for x, t in enumerate(r):
         if t in tile_mapper:
-            game_map[y * square_size:(y + 1) * square_size,
-                     x * square_size:(x + 1) * square_size] = tile_mapper[t]
+            game_map[y * SQUARE_SIZE:(y + 1) * SQUARE_SIZE,
+                     x * SQUARE_SIZE:(x + 1) * SQUARE_SIZE] = tile_mapper[t]
 
 cv.imwrite("your_map.png", game_map)
-exit(0)
+sys.exit(0)
