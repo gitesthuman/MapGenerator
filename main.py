@@ -269,23 +269,7 @@ done = False
 while not done:
     mouse = pygame.mouse.get_pos()
     draw_board_entities()
-
-    if selecting:
-        from_x = min(select_x, mouse[0]) // square_size
-        from_y = min(select_y, mouse[1]) // square_size
-        to_x = max(select_x, mouse[0]) // square_size
-        to_y = max(select_y, mouse[1]) // square_size
-
-        for j in range(from_y, to_y + 1):
-            for i in range(from_x, to_x + 1):
-                screen.blit(hover, (i * square_size, j * square_size))
-
-        pygame.draw.rect(screen, select_color, pygame.Rect(min(select_x, mouse[0]), min(select_y, mouse[1]),
-                                                           max(mouse[0] - select_x, select_x - mouse[0]),
-                                                           max(mouse[1] - select_y, select_y - mouse[1])), 2)
-
-    else:
-        screen.blit(hover, ((mouse[0] // square_size) * square_size, (mouse[1] // square_size) * square_size))
+    draw_hovers()
 
     for ev in pygame.event.get():
         if ev.type == pygame.QUIT:
