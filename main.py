@@ -85,7 +85,7 @@ screen_width = min(width * square_size, MAX_SCREEN_WIDTH)
 screen_height = min(height * square_size, MAX_SCREEN_HEIGHT)
 screen = pygame.display.set_mode((screen_width, screen_height))
 
-small_font = pygame.font.SysFont('Arial', 12)
+small_font = pygame.font.SysFont('Arial', 16)
 black = (0, 0, 0)
 color_light = (176, 176, 176)
 color_dark = (130, 130, 130)
@@ -176,8 +176,8 @@ while not done:
                 x = mouse[0] // square_size
                 y = mouse[1] // square_size
 
-                option_w = max([t[0].get_width() for t in available_tiles])
-                option_h = 12
+                option_h = 18
+                option_w = max([t[0].get_width() for t in available_tiles]) + option_h + 2
 
                 posX = min(mouse[0], screen_width - option_w)
                 posY = min(mouse[1], screen_height - option_h * len(available_tiles))
@@ -211,7 +211,10 @@ while not done:
                             added = True
 
                     for i, t in enumerate(available_tiles):
-                        screen.blit(t[0], (posX, posY + option_h * i - 1))
+                        screen.blit(t[0], (posX + 1, posY + option_h * i))
+                        screen.blit(pygame.transform.scale(
+                            pygame.image.frombuffer(tile_mapper[t[1]].tobytes(), tile_mapper[t[1]].shape[1::-1], "BGR"),
+                            (option_h, option_h)), (posX + option_w - option_h, posY + option_h * i))
 
                     pygame.display.update()
                 selecting = False
