@@ -59,7 +59,7 @@ button1.pack(side=BOTTOM, padx=5, pady=5)
 root.mainloop()
 
 if not confirm:
-    exit(0)
+    sys.exit(0)
 
 width = int(entries['Width'].get())
 height = int(entries['Height'].get())
@@ -100,9 +100,8 @@ from_y = 0
 to_x = 0
 to_y = 0
 
-done = False
-while not done:
-    mouse = pygame.mouse.get_pos()
+
+def draw_board():
     screen.fill(board_color)
 
     for k in range(1, width):
@@ -115,6 +114,11 @@ while not done:
             if t:
                 screen.blit(pygame.image.frombuffer(tile_mapper[t].tobytes(), tile_mapper[t].shape[1::-1], "BGR"),
                             (square_size * i, square_size * j))
+
+
+def draw_hovers():
+    global from_x, from_y, to_x, to_y
+
     if selecting:
         from_x = min(select_x, mouse[0]) // square_size
         from_y = min(select_y, mouse[1]) // square_size
@@ -126,22 +130,32 @@ while not done:
                 screen.blit(hover, (i * square_size, j * square_size))
 
         pygame.draw.rect(screen, select_color, pygame.Rect(min(select_x, mouse[0]), min(select_y, mouse[1]),
-                                                    max(mouse[0] - select_x, select_x - mouse[0]),
-                                                    max(mouse[1] - select_y, select_y - mouse[1])), 2)
-
+                                                           max(mouse[0] - select_x, select_x - mouse[0]),
+                                                           max(mouse[1] - select_y, select_y - mouse[1])), 2)
     else:
         screen.blit(hover, ((mouse[0] // square_size) * square_size, (mouse[1] // square_size) * square_size))
+
+
+# main loop
+done = False
+while not done:
+    mouse = pygame.mouse.get_pos()
+    draw_board()
+    draw_hovers()
 
     for ev in pygame.event.get():
         if ev.type == pygame.QUIT:
             exit(0)
+
         if ev.type == pygame.KEYDOWN:
             if ev.key == pygame.K_RETURN:
                 done = True
                 break
+
         if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1:
             selecting = True
             select_x, select_y = mouse[:2]
+
         if ev.type == pygame.MOUSEBUTTONUP and ev.button == 1:
             if selecting:
                 x = mouse[0] // square_size
@@ -153,6 +167,7 @@ while not done:
                 posX = min(mouse[0], screen_width - option_w)
                 posY = min(mouse[1], screen_height - option_h * len(available_tiles))
 
+                # change tile event
                 added = False
                 while not added:
                     mouse = pygame.mouse.get_pos()
@@ -170,9 +185,9 @@ while not done:
                         if ev2.type == pygame.QUIT:
                             exit(0)
                         if ev2.type == pygame.MOUSEBUTTONDOWN and ev2.button == 1:
-                            for i, t in enumerate(available_tiles):
+                            for n, t in enumerate(available_tiles):
                                 if posX <= mouse[0] < posX + option_w \
-                                        and posY + option_h * i <= mouse[1] < posY + option_h * (i + 1):
+                                        and posY + option_h * n <= mouse[1] < posY + option_h * (n + 1):
                                     for j in range(from_y, to_y + 1):
                                         for i in range(from_x, to_x + 1):
                                             tiles[j][i] = t[1]
@@ -186,50 +201,10 @@ while not done:
                     pygame.display.update()
                 selecting = False
 
-        if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 3:
-            x = mouse[0] // square_size
-            y = mouse[1] // square_size
-
-            option_w = max([t[0].get_width() for t in available_tiles])
-            option_h = 12
-
-            posX = min(mouse[0], screen_width - option_w)
-            posY = min(mouse[1], screen_height - option_h * len(available_tiles))
-
-            added = False
-            while not added:
-                mouse = pygame.mouse.get_pos()
-
-                for i, t in enumerate(available_tiles):
-                    if posX <= mouse[0] < posX + option_w \
-                            and posY + option_h * i <= mouse[1] < posY + option_h * (i + 1):
-                        pygame.draw.rect(screen, options_hover,
-                                         pygame.Rect(posX, posY + option_h * i, option_w, option_h))
-                    else:
-                        pygame.draw.rect(screen, options_color,
-                                         pygame.Rect(posX, posY + option_h * i, option_w, option_h))
-
-                for ev2 in pygame.event.get():
-                    if ev2.type == pygame.QUIT:
-                        exit(0)
-                    if ev2.type == pygame.MOUSEBUTTONDOWN and ev2.button == 1:
-                        for i, t in enumerate(available_tiles):
-                            if posX <= mouse[0] < posX + option_w \
-                                    and posY + option_h * i <= mouse[1] < posY + option_h * (i + 1):
-                                tiles[y][x] = t[1]
-                                break
-
-                        added = True
-
-                for i, t in enumerate(available_tiles):
-                    screen.blit(t[0], (posX, posY + option_h * i - 1))
-
-                pygame.display.update()
-
     pygame.display.update()
 
 game_map = np.zeros((screen_height, screen_width, 3), np.uint8)
-
+# paste tile on the board
 for y, r in enumerate(tiles):
     for x, t in enumerate(r):
         if t in tile_mapper:
